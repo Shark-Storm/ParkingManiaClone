@@ -10,6 +10,7 @@
 //                            Window Globals
 // ########################################################################
 static HWND window;
+static HDC dc;
 
 // ########################################################################
 //                            Platform Implementations
@@ -24,6 +25,16 @@ LRESULT CALLBACK windows_window_callback(HWND window, UINT msg,
         case WM_CLOSE:
         {
             running = false;
+            break;
+        }
+
+        case WM_SIZE:
+        {
+            RECT rect = {};
+            GetClientRect(window, &rect);
+            input.screenSizeX = rect.right - rect.left;
+            input.screenSizeY = rect.bottom - rect.top;
+
             break;
         }
 
@@ -169,7 +180,7 @@ bool platform_create_window(int width, int height, char* title)
                 return false;
             }
 
-            HDC dc = GetDC(window);
+            dc = GetDC(window);
             if(!dc)
             {
                 SM_ASSERT(false, "Failed to get DC");
@@ -264,4 +275,9 @@ void* platform_load_gl_function(char* funName)
     }
 
     return (void*)proc;
+}
+
+void platform_swap_buffers()
+{
+    SwapBuffers(dc);
 }
